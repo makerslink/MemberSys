@@ -1,0 +1,8 @@
+{
+  "name": "MemberSys",
+  "version": "1.0.0",
+  "dependencies": {
+    "connect": "^3.4.0",
+    "mongodb": "^2.0.39"
+  }
+}
