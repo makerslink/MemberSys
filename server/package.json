@@ -2,6 +2,7 @@
   "name": "MemberSys",
   "version": "1.0.0",
   "dependencies": {
+    "acl": "^0.4.7",
     "connect": "^3.4.0",
     "mongodb": "^2.0.39",
     "serve-static": "^1.10.0"
