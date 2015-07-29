@@ -1,11 +1,13 @@
 var acl = require('acl');
 var assert = require('assert')
+var async = require('async')
 
 var Cdb = function (db){
     this.db = db;
     this.acl = new acl(new acl.mongodbBackend(db, "acl"));
     //Add that public is allowed to add members...
     this.acl.allow("public", "members", "add");
+    //this.acl.removeAllow("public", "members", "add");
 }
 
 // Create a Controlled db that is controlled by ACL.
@@ -29,17 +31,33 @@ Cdb.prototype.addMember = function(member){
     }
     //Bind locally for callbacks...
     db = this.db;
-    this.acl.areAnyRolesAllowed("public", "members", "add", function(err, res){
-        if(res){
-            db.collection("members").insertOne(member, function(err, result) {
-                assert.equal(err, null);
-                console.log("Inserted member a member into db.");
-            });
-        
-        }else{
-            console.log("Not allowed to insert member into db.");
+    
+    var alloved = false;
+    var acl = this.acl;
+    
+    async.series([
+        function(callback){
+            acl.areAnyRolesAllowed("public", "members", "add", function(err, res){
+                alloved = res;
+                callback(err, alloved);
+            })
+        },
+        function(callback){
+            if(alloved){
+                db.collection("members").insertOne(member, function(err, result) {
+                    assert.equal(err, null);
+                    console.log("Inserted member a member into db.");
+                    callback(err, result);
+                    return;
+                });
+            }else{
+                console.log("Faild to insert member.");
+                callback(null, null);
+                return;
+            }
         }
-    });
+    ]);
+    
 }
 
 
