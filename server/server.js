@@ -13,7 +13,10 @@ app.use( serve )
 http.createServer(app).listen(3000)
 
 memberDB.connect(function(err, cdb) {
-	var larlin = {email:{address:"larlin@lysator.liu.se", visibility:"private"}};
-	
-	cdb.addMember(function(err, data){}, larlin);
+	              
+	var larlin = {"fields":[{"email":"test@test.test", "visibility":"private"},
+	                        {"username":"larlin", "visibility":"public"},
+	                        {"name":"Lars", "visibility":"members"}]};
+	//cdb.addMember(function(err, data){}, larlin);
+	cdb.getMember(function(err, data){}, "larlin", "larlin");
 })
