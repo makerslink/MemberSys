@@ -15,5 +15,5 @@ http.createServer(app).listen(3000)
 memberDB.connect(function(err, cdb) {
 	var larlin = {email:{address:"larlin@lysator.liu.se", visibility:"private"}};
 	
-	cdb.addMember(larlin);
+	cdb.addMember(function(err, data){}, larlin);
 })

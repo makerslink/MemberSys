@@ -15,7 +15,7 @@ var Cdb = function (db){
 Cdb.prototype.setRequiredFields = function(fields){
     this.requiredFields = fields;
 }
-Cdb.prototype.addMember = function(member){
+Cdb.prototype.addMember = function(callback, member){
     for(field in this.requiredFields){
         if (!(field in member) || member[field].trim().length == 0){
             //The required field dosen't exist or is a empty string.
@@ -58,6 +58,7 @@ Cdb.prototype.addMember = function(member){
         }
     ]);
     
+    callback(null, null);
 }
 
 
