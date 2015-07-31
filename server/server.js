@@ -18,5 +18,10 @@ memberDB.connect(function(err, cdb) {
 	                        {"type":"username", "value":"larlin", "visibility":"public"},
 	                        {"type":"name", "value":"Lars", "visibility":"members"}]};
 	//cdb.addMember(function(err, data){}, larlin);
-	cdb.getMember(function(err, data){}, "larlin", "test");
+	cdb.getMember("larlin", "test",
+	    function(err, data){
+	        for(row in data){
+                console.log(data[row]);
+            }
+	    });
 })

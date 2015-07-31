@@ -65,7 +65,7 @@ Cdb.prototype.addMember = function(callback, member){
     callback(null, null);
 }
 
-Cdb.prototype.getMember = function(callback, user, member){
+Cdb.prototype.getMember = function(user, member, callback){
     //Bind locally for callbacks...
     
     var acl = this.acl;
@@ -114,12 +114,14 @@ Cdb.prototype.getMember = function(callback, user, member){
         },
         function(alloved, members, callback){
             if(alloved && members != null){
-                for(row in members){
-                    console.log(members[row]);
-                }
+                callback(null, members);
+                return;
             }
         }
-    ]);
+    ], function(err, result){
+        callback(err, result);
+        return;
+    });
 }
 
 
