@@ -70,6 +70,7 @@ Cdb.prototype.getMember = function(callback, user, member){
     var acl = this.acl;
     var viewPermissions = new Array();
     var db = this.db;
+    var members;
     async.series([
         function(callback){
             acl.isAllowed(user, "members", "view", function(err, res){
@@ -98,14 +99,26 @@ Cdb.prototype.getMember = function(callback, user, member){
                 console.log(viewPermissions);
                 //This fetches all members and their data with the visibilities that are in viewPermissions...
                 //TODO: implement search for a member with respect to some search parameter (e.g. email)
-                //TODO Move the callback here to a new step in the chain...
                 db.collection("members").aggregate([{$unwind: "$fields"},
                                                     {$match: {"fields.visibility":{$in:["public","members"]}}},
                                                     {$group:{_id:"$_id",fields:{$addToSet: "$fields"}}}],function(err, result) {
                     for(row in result){
                         console.log(result[row]);
                     }
+                    members = result;
+                    callback(err, result);
+                    return;
                 });
+            }else{
+                callback(null, null);
+                return;
+            }
+        },
+        function(callback){
+            if(alloved && members != null){
+                for(row in members){
+                    console.log(members[row]);
+                }
             }
         }
     ]);
