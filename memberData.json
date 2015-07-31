@@ -2,3 +2,5 @@
 {"private":{"email":"test@test.test"}}
 
 {"fields":[{"name":"email", "address":"test@test.test", "visibility":"private"}]}
+
+{"fields":[{"type":"email", "value":"test@test.test", "visibility":"private"}]}

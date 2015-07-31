@@ -14,9 +14,9 @@ http.createServer(app).listen(3000)
 
 memberDB.connect(function(err, cdb) {
 	              
-	var larlin = {"fields":[{"email":"test@test.test", "visibility":"private"},
-	                        {"username":"larlin", "visibility":"public"},
-	                        {"name":"Lars", "visibility":"members"}]};
+	var larlin = {"fields":[{"type":"email", "value":"test@test.test", "visibility":"private"},
+	                        {"type":"username", "value":"larlin", "visibility":"public"},
+	                        {"type":"name", "value":"Lars", "visibility":"members"}]};
 	//cdb.addMember(function(err, data){}, larlin);
-	cdb.getMember(function(err, data){}, "larlin", "larlin");
+	cdb.getMember(function(err, data){}, "larlin", "test");
 })

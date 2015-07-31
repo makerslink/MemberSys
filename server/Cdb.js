@@ -10,6 +10,7 @@ var Cdb = function (db){
     //this.acl.removeAllow("public", "members", "add");
     this.acl.allow("member", "members", ["view", "view-public", "view-members"]);
     this.acl.addUserRoles("larlin", "member");
+    db.collection("members").createIndex({"fields.value":"text"});
 }
 
 // Create a Controlled db that is controlled by ACL.
@@ -99,16 +100,18 @@ Cdb.prototype.getMember = function(callback, user, member){
                 console.log(viewPermissions);
                 //This fetches all members and their data with the visibilities that are in viewPermissions...
                 //TODO: implement search for a member with respect to some search parameter (e.g. email)
-                db.collection("members").aggregate([{$unwind: "$fields"},
-                                                    {$match: {"fields.visibility":{$in:["public","members"]}}},
-                                                    {$group:{_id:"$_id",fields:{$addToSet: "$fields"}}}],function(err, result) {
-                    for(row in result){
-                        console.log(result[row]);
+                db.collection("members").aggregate(
+                    [{$match: {$text:{$search:member}}},
+                    {$unwind: "$fields"},
+                    {$match: {"fields.visibility":{$in:["public","members"]}}},
+                    //
+                    {$group:{_id:"$_id",fields:{$addToSet: "$fields"}}}],
+                    function(err, result) {
+                        members = result;
+                        callback(err, result);
+                        return;
                     }
-                    members = result;
-                    callback(err, result);
-                    return;
-                });
+                );
             }else{
                 callback(null, null);
                 return;
