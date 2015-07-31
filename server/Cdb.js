@@ -10,6 +10,7 @@ var Cdb = function (db){
     //this.acl.removeAllow("public", "members", "add");
     this.acl.allow("member", "members", ["view", "view-public", "view-members"]);
     this.acl.addUserRoles("larlin", "member");
+    //TODO: Move the init to something that is only runned once when the database i set up.
     db.collection("members").createIndex({"fields.value":"text"});
 }
 
@@ -67,57 +68,51 @@ Cdb.prototype.addMember = function(callback, member){
 Cdb.prototype.getMember = function(callback, user, member){
     //Bind locally for callbacks...
     
-    var alloved = false;
     var acl = this.acl;
-    var viewPermissions = new Array();
     var db = this.db;
-    var members;
-    async.series([
+    async.waterfall([
         function(callback){
             acl.isAllowed(user, "members", "view", function(err, res){
-                alloved = res;
-                callback(err, alloved);
+                callback(err, res);
             });
         },
-        function(callback){
+        function(alloved, callback){
             if(alloved){
                 acl.allowedPermissions(user, "members", function(err, res){
                     var permissions = res["members"];
+                    var viewPermissions = new Array();
                     for(i in res["members"]){
                         if(permissions[i].indexOf("view-")>=0){
                             viewPermissions.push(permissions[i].split("-")[1]);
                         }
                     }
-                    callback(err, viewPermissions);
+                    callback(err, alloved, viewPermissions);
                 });
             }else{
-                callback(null, null);
+                callback(null, null, null);
                 return;
             }
         },
-        function(callback){
+        function(alloved, viewPermissions, callback){
             if(alloved){
                 console.log(viewPermissions);
                 //This fetches all members and their data with the visibilities that are in viewPermissions...
-                //TODO: implement search for a member with respect to some search parameter (e.g. email)
                 db.collection("members").aggregate(
                     [{$match: {$text:{$search:member}}},
                     {$unwind: "$fields"},
                     {$match: {"fields.visibility":{$in:["public","members"]}}},
-                    //
                     {$group:{_id:"$_id",fields:{$addToSet: "$fields"}}}],
                     function(err, result) {
-                        members = result;
-                        callback(err, result);
+                        callback(err, alloved, result);
                         return;
                     }
                 );
             }else{
-                callback(null, null);
+                callback(null, null, null);
                 return;
             }
         },
-        function(callback){
+        function(alloved, members, callback){
             if(alloved && members != null){
                 for(row in members){
                     console.log(members[row]);
