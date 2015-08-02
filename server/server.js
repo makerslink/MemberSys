@@ -1,3 +1,5 @@
+"use strict";
+
 var connect = require('connect')
 var http = require('http')
 var serveStatic = require('serve-static')
@@ -21,7 +23,7 @@ memberDB.connect(function(err, cdb) {
 	cdb.getMember("larlin", "test",
 	    function(err, data){
 	        if(err == null){
-	            for(row in data){
+	            for(var row in data){
                     console.log(data[row]);
                 }
             }else{

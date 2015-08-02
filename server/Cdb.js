@@ -1,3 +1,5 @@
+"use strict";
+
 var acl = require('acl');
 var assert = require('assert')
 var async = require('async')
@@ -27,14 +29,14 @@ Cdb.prototype.addMember = function(callback, member){
         }
     }
     
-    for(field in member){
+    for(var field in member){
         if (!("visibility" in member[field])){
             //Add default visibility
             member[field]["visibility"] = "private";
         }
     }
     //Bind locally for callbacks...
-    db = this.db;
+    var db = this.db;
     
     var alloved = false;
     var acl = this.acl;
@@ -86,7 +88,7 @@ Cdb.prototype.getMember = function(user, member, callback){
             acl.allowedPermissions(user, "members", function(err, res){
                 var permissions = res["members"];
                 var viewPermissions = new Array();
-                for(i in res["members"]){
+                for(var i in res["members"]){
                     if(permissions[i].indexOf("view-")>=0){
                         viewPermissions.push(permissions[i].split("-")[1]);
                     }

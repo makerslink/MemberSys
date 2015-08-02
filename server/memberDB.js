@@ -1,3 +1,5 @@
+"use strict";
+
 var Cdb = require('./Cdb')
 
 var MongoClient = require('mongodb').MongoClient;
