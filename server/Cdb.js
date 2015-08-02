@@ -73,50 +73,46 @@ Cdb.prototype.getMember = function(user, member, callback){
     async.waterfall([
         function(callback){
             acl.isAllowed(user, "members", "view", function(err, res){
-                callback(err, res);
+                if(res){
+                    callback(err);
+                    return;
+                }else{
+                    callback(new Error("User have insuffiecent permission for this operation."));
+                    return;
+                }
             });
         },
-        function(alloved, callback){
-            if(alloved){
-                acl.allowedPermissions(user, "members", function(err, res){
-                    var permissions = res["members"];
-                    var viewPermissions = new Array();
-                    for(i in res["members"]){
-                        if(permissions[i].indexOf("view-")>=0){
-                            viewPermissions.push(permissions[i].split("-")[1]);
-                        }
+        function(callback){
+            acl.allowedPermissions(user, "members", function(err, res){
+                var permissions = res["members"];
+                var viewPermissions = new Array();
+                for(i in res["members"]){
+                    if(permissions[i].indexOf("view-")>=0){
+                        viewPermissions.push(permissions[i].split("-")[1]);
                     }
-                    callback(err, alloved, viewPermissions);
-                });
-            }else{
-                callback(null, null, null);
-                return;
-            }
+                }
+                
+                if(viewPermissions.length > 0 && err == null){
+                    callback(err, viewPermissions);
+                }else{
+                    callback(new Error("User have insuffiecent permission for this operation."), viewPermissions);
+                }
+                
+                
+            });
         },
-        function(alloved, viewPermissions, callback){
-            if(alloved){
-                console.log(viewPermissions);
-                //This fetches all members and their data with the visibilities that are in viewPermissions...
-                db.collection("members").aggregate(
-                    [{$match: {$text:{$search:member}}},
-                    {$unwind: "$fields"},
-                    {$match: {"fields.visibility":{$in:["public","members"]}}},
-                    {$group:{_id:"$_id",fields:{$addToSet: "$fields"}}}],
-                    function(err, result) {
-                        callback(err, alloved, result);
-                        return;
-                    }
-                );
-            }else{
-                callback(null, null, null);
-                return;
-            }
-        },
-        function(alloved, members, callback){
-            if(alloved && members != null){
-                callback(null, members);
-                return;
-            }
+        function(viewPermissions, callback){
+            //This fetches all members and their data with the visibilities that are in viewPermissions...
+            db.collection("members").aggregate(
+                [{$match: {$text:{$search:member}}},
+                {$unwind: "$fields"},
+                {$match: {"fields.visibility":{$in:["public","members"]}}},
+                {$group:{_id:"$_id",fields:{$addToSet: "$fields"}}}],
+                function(err, result) {
+                    callback(err, result);
+                    return;
+                }
+            );
         }
     ], function(err, result){
         callback(err, result);

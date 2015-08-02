@@ -20,8 +20,12 @@ memberDB.connect(function(err, cdb) {
 	//cdb.addMember(function(err, data){}, larlin);
 	cdb.getMember("larlin", "test",
 	    function(err, data){
-	        for(row in data){
-                console.log(data[row]);
+	        if(err == null){
+	            for(row in data){
+                    console.log(data[row]);
+                }
+            }else{
+                console.log(err);
             }
 	    });
 })
