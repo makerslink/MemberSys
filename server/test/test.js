@@ -14,6 +14,8 @@ var dbUrl = 'mongodb://localhost:27017/'+dbName;
 //db.dropCollection(collection, callback);
 //MongoClient.connect(dbUrl, function(err, db)
 
+//nodeunit npm nodeunit
+
 
 //TODO: Load this from a json file...
 var document = '{fields:[{type:"email", value:"test@test.test", visibility:"private"}]}';
