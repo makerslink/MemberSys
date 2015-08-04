@@ -1,4 +1,5 @@
 [ ] Databse layer with API to read/write data from MongoDB. Access control goes here.
+    Levels in the system, private, members, assoc-members, public
 [ ] AJAX interface between webpage with react.js and server to access data from MongoDB. Session management goes here.
 [ ] User input verification, same code should run on client and server
 [ ] Page for membership signup
