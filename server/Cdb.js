@@ -108,8 +108,7 @@ Cdb.prototype.getMember = function(user, member, callback){
             db.collection("members").aggregate(
                 [{$match: {$text:{$search:member}}},
                 {$unwind: "$fields"},
-                //TODO:Change in to actuall permissons for this user....
-                {$match: {"fields.visibility":{$in:["public","members"]}}},
+                {$match: {"fields.visibility":{$in:viewPermissions}}},
                 {$group:{_id:"$_id",fields:{$addToSet: "$fields"}}}],
                 function(err, result) {
                     callback(err, result);

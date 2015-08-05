@@ -14,7 +14,6 @@ var memberDB = function(){};
 memberDB.connect = function(callback){
     MongoClient.connect(dbUrl, function(err, db) {
         assert.equal(null, err);
-        this.db = db;
         
 	    var cdb = new Cdb(db);
 	    
