@@ -17,34 +17,39 @@ var dbUrl = 'mongodb://localhost:27017/'+dbName;
 //nodeunit npm nodeunit
 
 
-//TODO: Load this from a json file...
-var document = '{"fields":[{"type":"email", "value":"test@test.test", "visibility":"private"}]}';
-var db;
+exports.dbInsert = function(test){
 
-async.waterfall([
-    function(callback){
-        MongoClient.connect(dbUrl, function(err, tempdb) {
-            assert.equal(null, err);
-            
-	        db = tempdb
-	        
-	        callback(null);
-        });
-    },
-    function(callback){
-        db.dropDatabase(function(err, status) {
-            assert.equal(null, err);
-            
-            callback(null);
-        });
-    },
-    function(callback){
-        db.collection('members').insert(JSON.parse(document), function(err, status) {
-            assert.equal(null, err);
-            
-            callback(null);
-        });
-    }
-]);
+    //TODO: Load this from a json file...
+    var document = '{"fields":[{"type":"email", "value":"test@test.test", "visibility":"private"}]}';
+    var db;
 
-
+    async.waterfall([
+        function(callback){
+            MongoClient.connect(dbUrl, function(err, tempdb) {
+                test.ifError(err);
+                
+	            db = tempdb
+	            
+	            callback(null);
+            });
+        },
+        function(callback){
+            db.dropDatabase(function(err, status) {
+                test.ifError(err);
+                
+                callback(null);
+            });
+        },
+        function(callback){
+            db.collection('members').insert(JSON.parse(document), function(err, status) {
+                test.ifError(err);
+                
+                db.close();
+                
+                callback(null);
+            });
+        }
+    ]);
+    test.done();
+    
+};
