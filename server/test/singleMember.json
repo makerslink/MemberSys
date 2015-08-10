@@ -1,0 +1,3 @@
+{"fields":[{"type":"email", "value":"test@test.test", "visibility":"private"},
+	       {"type":"username", "value":"test", "visibility":"public"},
+	       {"type":"name", "value":"Test", "visibility":"members"}]}

@@ -1,0 +1,8 @@
+{"members":[
+	{"fields":[{"type":"email", "value":"larlin@test.test", "visibility":"private"},
+			   {"type":"username", "value":"larlin", "visibility":"public"},
+			   {"type":"name", "value":"Lars", "visibility":"members"}]},
+	{"fields":[{"type":"email", "value":"kallke@test.test", "visibility":"private"},
+			   {"type":"username", "value":"kallke", "visibility":"public"},
+			   {"type":"name", "value":"Kalle", "visibility":"members"}]}
+]}
