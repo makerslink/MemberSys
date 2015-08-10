@@ -18,22 +18,32 @@ var dbUrl = 'mongodb://localhost:27017/'+dbName;
 
 
 //TODO: Load this from a json file...
-var document = '{fields:[{type:"email", value:"test@test.test", visibility:"private"}]}';
+var document = '{"fields":[{"type":"email", "value":"test@test.test", "visibility":"private"}]}';
+var db;
 
 async.waterfall([
     function(callback){
-        MongoClient.connect(dbUrl, callback)
+        MongoClient.connect(dbUrl, function(err, tempdb) {
+            assert.equal(null, err);
+            
+	        db = tempdb
+	        
+	        callback(null);
+        });
     },
-    function(err, db, callback){
-        assert.equal(err, null);
-        db.dropDatabase();
+    function(callback){
+        db.dropDatabase(function(err, status) {
+            assert.equal(null, err);
+            
+            callback(null);
+        });
     },
-    function(err, db, callback){
-        assert.equal(err, null);
-        db.collection('members').insert(document, callback);
-    },
-    function(err, db, callback){
-        assert.equal(err, null);
+    function(callback){
+        db.collection('members').insert(JSON.parse(document), function(err, status) {
+            assert.equal(null, err);
+            
+            callback(null);
+        });
     }
 ]);
 

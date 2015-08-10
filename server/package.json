@@ -1,11 +1,15 @@
 {
   "name": "MemberSys",
   "version": "1.0.0",
+  "scripts": {
+    "test": "node_modules/nodeunit/bin/nodeunit ./test/test.js"
+  },
   "dependencies": {
     "acl": "^0.4.7",
     "async": "^1.4.0",
     "connect": "^3.4.0",
     "mongodb": "^2.0.39",
+    "nodeunit": "^0.9.1",
     "serve-static": "^1.10.0"
   }
 }
