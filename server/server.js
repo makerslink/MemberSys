@@ -19,7 +19,7 @@ memberDB.connect(function(err, cdb) {
 	var larlin = {"fields":[{"type":"email", "value":"test@test.test", "visibility":"private"},
 	                        {"type":"username", "value":"larlin", "visibility":"public"},
 	                        {"type":"name", "value":"Lars", "visibility":"members"}]};
-	//cdb.addMember(function(err, data){}, larlin);
+	//cdb.addMember(larlin, function(err, data){});
 	cdb.getMember("larlin", "test",
 	    function(err, data){
 	        if(err == null){
