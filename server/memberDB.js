@@ -17,7 +17,10 @@ memberDB.connect = function(callback){
         
 	    var cdb = new Cdb(db);
 	    
-	    callback(null, cdb);
+	    cdb.configure(function(){
+	    	callback(null, cdb);
+	    });
+	    
     });
 };
 

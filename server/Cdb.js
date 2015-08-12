@@ -7,17 +7,38 @@ var async = require('async')
 var Cdb = function (db){
     this.db = db;
     this.acl = new acl(new acl.mongodbBackend(db, "acl"));
-    //Add that public is allowed to add members...
-    this.acl.allow("public", "members", ["add", "view-public"]);
-    //this.acl.removeAllow("public", "members", "add");
-    this.acl.allow("member", "members", ["view", "view-public", "view-members"]);
-    this.acl.addUserRoles("larlin", "member");
-    //TODO: Move the init to something that is only runned once when the database i set up.
-    db.collection("members").createIndex({"fields.value":"text"});
 }
 
 // Create a Controlled db that is controlled by ACL.
-
+Cdb.prototype.configure = function(callback){
+    var acl = this.acl;
+    var db = this.db;
+    async.series([
+        function(callback){
+            //Add that public is allowed to add members...
+            //TODO: Public should only be allowed to add a new member without
+            //      any special permissions
+            acl.allow("public", "members", ["add", "view-public"], callback);
+        },
+        //function(callback){
+        //    this.acl.removeAllow("public", "members", "add", callback);
+        //},
+        function(callback){
+            //Add that members can view members and their member public data...
+            acl.allow("member", "members", ["view", "view-public", "view-members"], callback);
+        },
+        function(callback){
+            //TODO: REMOVE this is for testing, add larlin as member...
+            acl.addUserRoles("larlin", "member", callback);
+        },
+        function(callback){
+            //TODO: Move the init to something that is only runned once when the database i set up.
+            db.collection("members").createIndex({"fields.value":"text"}, callback);
+        }
+    ],function(err, result){
+        callback();
+    });
+}
 Cdb.prototype.setRequiredFields = function(fields){
     this.requiredFields = fields;
 }
@@ -52,7 +73,6 @@ Cdb.prototype.addMember = function(member, callback){
             if(alloved){
                 db.collection("members").insertOne(member, function(err, result) {
                     assert.equal(err, null);
-                    console.log("Inserted member a member into db.");
                     callback(err, result);
                     return;
                 });

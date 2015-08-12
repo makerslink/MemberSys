@@ -4,6 +4,8 @@ var memberDB = require('../memberDB');
 var testCase = require('nodeunit').testCase;
 var fs = require('fs');
 
+var Cdb = require('../Cdb');
+
 var MongoClient = require('mongodb').MongoClient;
 var async = require('async')
 
@@ -81,7 +83,7 @@ module.exports.bareDb = {
 };
 
 var cdb;
-modules.exports.Cdb = {
+module.exports.protectedDb = {
     setUp: function (callback) {
         MongoClient.connect(dbUrl, function(err, tmpDb) {
             assert.equal(null, err);
@@ -92,30 +94,41 @@ modules.exports.Cdb = {
                 assert.equal(null, err);
                 
 	            cdb = new Cdb(db);
+	            cdb.configure(function(){    
+	                callback();
+	            });
 	            
-	            callback();
             });
         });
     },
     insertOneMember: function (test){
+        test.expect(4);
         async.series([
             function(callback){
                 fs.readFile('test/singleMember.json', 'utf8', function (err, data) {
                     test.ifError(err);
                     singleMember = JSON.parse(data);
                     callback(err, singleMember);
-                }
+                });
             },
             function(callback){
-                
+                cdb.addMember(singleMember, function(err, data){
+                    test.ifError(err)
+                    callback(err, data);
+                });
+            },
+            function(callback){
+                cdb.getMember("larlin", "test", function(err, data){
+                    test.ifError(err);
+                    test.equal(data.length, 1);
+                    console.log(data[0]);
+                    
+                    callback(err, data);
+                });
             }
-        ]);
-        
-            cdb.addMember(function(err, data){
-                test.ifError(err)
-            }, singleMember);
-            
-            test.done();
+        ],
+        function(err, result){
+        	test.done();
         });
     },
     tearDown: function (callback) {
