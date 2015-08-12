@@ -12,7 +12,7 @@ var ObjectId = require('mongodb').ObjectID;
 var dbName = "makerMember_test"
 var dbUrl = 'mongodb://localhost:27017/'+dbName;
 
-var tempDb;
+var db;
 var multiMembers;
 var singleMember;
 
@@ -39,16 +39,16 @@ module.exports.bareDb = {
     },
     connect: function (test) {
         test.expect(1);
-        MongoClient.connect(dbUrl, function(err, db) {
+        MongoClient.connect(dbUrl, function(err, tempDb) {
             test.ifError(err);
-            tempDb = db;
+            db = tempDb;
             
             test.done();
         });
     },
     dropDatabase: function (test) {
         test.expect(1);
-        tempDb.dropDatabase(function(err, status) {
+        db.dropDatabase(function(err, status) {
             test.ifError(err);
             
             test.done();
@@ -56,10 +56,10 @@ module.exports.bareDb = {
     },
     insertSingle: function (test){
         test.expect(2);
-        tempDb.collection('members').insert(singleMember, function(err, status) {
+        db.collection('members').insert(singleMember, function(err, status) {
             test.ifError(err);
             
-            tempDb.collection('members').count("", function(err, result){
+            db.collection('members').count("", function(err, result){
                 test.equal(result, 1, "Number of documents not 1 after inserting 1");
                 test.done();
             });
@@ -67,18 +67,63 @@ module.exports.bareDb = {
     },
     insertMulti: function (test){
         test.expect(2);
-        tempDb.collection('members').insert(multiMembers.members, function(err, status) {
+        db.collection('members').insert(multiMembers.members, function(err, status) {
             test.ifError(err);
             
-            tempDb.collection('members').count("", function(err, result){
+            db.collection('members').count("", function(err, result){
                 // +1 as one member is still in the database from the single member test...
                 test.equal(result, multiMembers.members.length+1, "Number of documents not 1 after inserting 1");
                 test.done();
-                tempDb.close();
+                db.close();
             });
         });
     },
 };
+
+var cdb;
+modules.exports.Cdb = {
+    setUp: function (callback) {
+        MongoClient.connect(dbUrl, function(err, tmpDb) {
+            assert.equal(null, err);
+            
+            db = tmpDb;
+            
+            db.dropDatabase(function(err, status) {
+                assert.equal(null, err);
+                
+	            cdb = new Cdb(db);
+	            
+	            callback();
+            });
+        });
+    },
+    insertOneMember: function (test){
+        async.series([
+            function(callback){
+                fs.readFile('test/singleMember.json', 'utf8', function (err, data) {
+                    test.ifError(err);
+                    singleMember = JSON.parse(data);
+                    callback(err, singleMember);
+                }
+            },
+            function(callback){
+                
+            }
+        ]);
+        
+            cdb.addMember(function(err, data){
+                test.ifError(err)
+            }, singleMember);
+            
+            test.done();
+        });
+    },
+    tearDown: function (callback) {
+        db.close();
+        
+        callback();
+    }
+}
 
 //process.on('uncaughtException', function(err) {
 //  console.error(err.stack);
