@@ -1,0 +1,16 @@
+== Permissions ==
+view:
+	view-private
+	view-members
+	view-assoc-members
+	view-public
+
+add:
+
+edit:
+
+== Resources ==
+
+members
+
+role

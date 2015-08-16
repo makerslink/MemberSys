@@ -13,6 +13,11 @@ var Cdb = function (db){
 Cdb.prototype.configure = function(callback){
     var acl = this.acl;
     var db = this.db;
+    
+    //All permissions and roles used...
+    var permissions = ["add", "view", "view-private", "view-members", "view-assoc-members", "view-public", "edit", ];
+    var resources = ["members", "roles"];
+    
     async.series([
         function(callback){
             //Add that public is allowed to add members...
@@ -23,13 +28,19 @@ Cdb.prototype.configure = function(callback){
         //function(callback){
         //    this.acl.removeAllow("public", "members", "add", callback);
         //},
+       function(callback){
+            //Administrators can do everything...
+            acl.allow("admin", resources, permissions, callback);
+        },
         function(callback){
             //Add that members can view members and their member public data...
             acl.allow("member", "members", ["view", "view-public", "view-members"], callback);
         },
         function(callback){
-            //TODO: REMOVE this is for testing, add larlin as member...
-            acl.addUserRoles("larlin", "member", callback);
+            //TODO: REMOVE this is for testing, add larlin as admin...
+            //We need to create some sort of super user at first and then
+            //let a user become this user.
+            acl.addUserRoles("larlin", "admin", callback);
         },
         function(callback){
             //TODO: Move the init to something that is only runned once when the database i set up.
@@ -140,6 +151,25 @@ Cdb.prototype.getMember = function(user, member, callback){
         callback(err, result);
         return;
     });
+}
+
+Cdb.prototype.addRole = function(user, member, role, callback){
+	async.waterfall([
+		function(callback){
+			acl.isAllowed(user, "role", "add", function(err, res){
+				if(res){
+					callback(err);
+					return;
+				}else{
+					callback(new Error("User have insuffiecent permission for this operation."));
+					return;
+				}
+			}
+		},
+		function(callback){
+			acl.addUserRoles(member, role, callback)
+		}
+	]);
 }
 
 

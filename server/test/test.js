@@ -123,6 +123,7 @@ module.exports.protectedDb = {
                     test.equal(data.length, 1);
                     console.log(data[0]);
                     
+                    
                     callback(err, data);
                 });
             }
@@ -137,6 +138,10 @@ module.exports.protectedDb = {
         callback();
     }
 }
+
+//module.exports.roles = {
+//    
+//}
 
 //process.on('uncaughtException', function(err) {
 //  console.error(err.stack);
