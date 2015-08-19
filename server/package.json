@@ -5,7 +5,7 @@
     "test": "node_modules/nodeunit/bin/nodeunit ./test/test.js"
   },
   "dependencies": {
-    "acl": "^0.4.7",
+    "acl": "0.4.7",
     "async": "^1.4.0",
     "connect": "^3.4.0",
     "mongodb": "^2.0.39",
