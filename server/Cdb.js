@@ -164,7 +164,7 @@ Cdb.prototype.addRole = function(user, member, role, callback){
 					callback(new Error("User have insuffiecent permission for this operation."));
 					return;
 				}
-			}
+			})
 		},
 		function(callback){
 			acl.addUserRoles(member, role, callback)
