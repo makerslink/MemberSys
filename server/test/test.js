@@ -19,6 +19,10 @@ var cdb;
 var multiMembers;
 var singleMember;
 
+var adminUser = "larlin";
+var adminTestUser = "adminTest";
+var testMember = "test";
+
 //A short and simple test suite for testing that the basic db connection
 // works at all.
 module.exports.bareDb = {
@@ -108,8 +112,8 @@ module.exports.protectedDb = {
                 });
             },
             function(callback){
-                cdb.addFirstAdmin("larlin", function(err, data) {
-                    callback();
+                cdb.addFirstAdmin(adminUser, function(err, data) {
+                    callback(err);
                 });
             }
         ],
@@ -118,7 +122,7 @@ module.exports.protectedDb = {
         });
     },
     insertOneMember: function (test){
-        test.expect(4);
+        test.expect(5);
         async.series([
             function(callback){
                 fs.readFile('test/singleMember.json', 'utf8', function (err, data) {
@@ -134,8 +138,9 @@ module.exports.protectedDb = {
                 });
             },
             function(callback){
-                cdb.getMember("larlin", "test", function(err, data){
+                cdb.getMember(adminUser, testMember, function(err, data){
                     test.ifError(err);
+                    test.ok(data);
                     test.equal(data.length, 1);
                     //console.log(data[0]);
                     
@@ -151,7 +156,7 @@ module.exports.protectedDb = {
         test.expect(1);
         async.series([
             function(callback){
-                cdb.addFirstAdmin("test", function(err, data) {
+                cdb.addFirstAdmin(adminTestUser, function(err, data) {
                     test.notEqual(err, null);
                     callback(err, data);
                 });

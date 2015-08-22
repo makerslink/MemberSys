@@ -4,6 +4,7 @@ var connect = require('connect')
 var http = require('http')
 var serveStatic = require('serve-static')
 var memberDB = require('./memberDB')
+var async = require('async')
 
 var app = connect()
 
@@ -16,18 +17,37 @@ http.createServer(app).listen(3000)
 
 memberDB.connect(function(err, cdb) {
 	              
-	var larlin = {"fields":[{"type":"email", "value":"test@test.test", "visibility":"private"},
-	                        {"type":"username", "value":"larlin", "visibility":"public"},
-	                        {"type":"name", "value":"Lars", "visibility":"members"}]};
-	//cdb.addMember(larlin, function(err, data){});
-	cdb.getMember("larlin", "test",
-	    function(err, data){
-	        if(err == null){
-	            for(var row in data){
-                    console.log(data[row]);
+	var test = {"fields":[{"type":"email", "value":"test@test.test", "visibility":"private"},
+	                      {"type":"username", "value":"larlin", "visibility":"public"},
+	                      {"type":"name", "value":"Lars", "visibility":"members"}]};
+	//cdb.addMember(test, function(err, data){});
+	
+	var admin = "larlin";
+	
+    async.series([
+        function(callback){
+            cdb.configure(function(){    
+                callback();
+            });
+        },
+        function(callback){
+            cdb.addFirstAdmin(admin, function(err, data) {
+                callback(err);
+            });
+        },
+        //function(callback){
+        //    cdb.addMember(test, function(err, data) {callback(err);});
+        //},
+        function(callback){
+            cdb.getMember("larlin", "test", function(err, data){
+                if(err == null){
+                    for(var row in data){
+                        console.log(data[row]);
+                    }
+                }else{
+                    console.log(err);
                 }
-            }else{
-                console.log(err);
-            }
-	    });
+            });
+        }
+    ]);	
 })

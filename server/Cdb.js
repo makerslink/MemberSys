@@ -37,12 +37,6 @@ Cdb.prototype.configure = function(callback){
             acl.allow("member", "members", ["view", "view-public", "view-members"], callback);
         },
         function(callback){
-            //TODO: REMOVE this is for testing, add larlin as admin...
-            //We need to create some sort of super user at first and then
-            //let a user become this user.
-            acl.addUserRoles("larlin", "admin", callback);
-        },
-        function(callback){
             //TODO: Move the init to something that is only runned once when the database i set up.
             db.collection("members").createIndex({"fields.value":"text"}, callback);
         }
@@ -180,8 +174,8 @@ Cdb.prototype.addFirstAdmin = function(member, callback){
     var acl = this.acl;
     async.waterfall([
         function(callback){
-            acl.roleUsers( "admin", function(err, users){
-                if(users != null){
+            acl.roleUsers("admin", function(err, users){
+                if(users.length != 0){
                     err = new Error("There is already a admin.");
                 }
                 callback(err);
