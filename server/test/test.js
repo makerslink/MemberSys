@@ -15,6 +15,7 @@ var dbName = "makerMember_test"
 var dbUrl = 'mongodb://localhost:27017/'+dbName;
 
 var db;
+var cdb;
 var multiMembers;
 var singleMember;
 
@@ -82,23 +83,38 @@ module.exports.bareDb = {
     },
 };
 
-var cdb;
 module.exports.protectedDb = {
     setUp: function (callback) {
-        MongoClient.connect(dbUrl, function(err, tmpDb) {
-            assert.equal(null, err);
-            
-            db = tmpDb;
-            
-            db.dropDatabase(function(err, status) {
+        async.series([
+            function(callback){
+                MongoClient.connect(dbUrl, function(err, tmpDb) {
                 assert.equal(null, err);
                 
-	            cdb = new Cdb(db);
-	            cdb.configure(function(){    
-	                callback();
-	            });
-	            
-            });
+                db = tmpDb;
+                callback(err);
+                });
+            },
+            function(callback){
+                db.dropDatabase(function(err, status) {
+                    assert.equal(null, err);
+                
+                    cdb = new Cdb(db);
+                    callback();
+                });
+            },
+            function(callback){
+                cdb.configure(function(){    
+                    callback();
+                });
+            },
+            function(callback){
+                cdb.addFirstAdmin("larlin", function(err, data) {
+                    callback();
+                });
+            }
+        ],
+        function(err, result){
+        	callback();
         });
     },
     insertOneMember: function (test){
@@ -121,8 +137,7 @@ module.exports.protectedDb = {
                 cdb.getMember("larlin", "test", function(err, data){
                     test.ifError(err);
                     test.equal(data.length, 1);
-                    console.log(data[0]);
-                    
+                    //console.log(data[0]);
                     
                     callback(err, data);
                 });
@@ -132,16 +147,26 @@ module.exports.protectedDb = {
         	test.done();
         });
     },
+    roles: function (test){
+        test.expect(1);
+        async.series([
+            function(callback){
+                cdb.addFirstAdmin("test", function(err, data) {
+                    test.notEqual(err, null);
+                    callback(err, data);
+                });
+            }
+        ],
+        function(err, result){
+            test.done();
+        });
+    },
     tearDown: function (callback) {
         db.close();
         
         callback();
     }
 }
-
-//module.exports.roles = {
-//    
-//}
 
 //process.on('uncaughtException', function(err) {
 //  console.error(err.stack);

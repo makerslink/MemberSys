@@ -154,6 +154,7 @@ Cdb.prototype.getMember = function(user, member, callback){
 }
 
 Cdb.prototype.addRole = function(user, member, role, callback){
+    var acl = this.acl;
 	async.waterfall([
 		function(callback){
 			acl.isAllowed(user, "role", "add", function(err, res){
@@ -169,8 +170,30 @@ Cdb.prototype.addRole = function(user, member, role, callback){
 		function(callback){
 			acl.addUserRoles(member, role, callback)
 		}
-	]);
+	], function(err, result){
+        callback(err, result);
+        return;
+    });
 }
 
+Cdb.prototype.addFirstAdmin = function(member, callback){
+    var acl = this.acl;
+    async.waterfall([
+        function(callback){
+            acl.roleUsers( "admin", function(err, users){
+                if(users != null){
+                    err = new Error("There is already a admin.");
+                }
+                callback(err);
+            })
+        },
+        function(callback){
+            acl.addUserRoles(member, "admin", callback);
+        }
+    ], function(err, result){
+        callback(err, result);
+        return;
+    });
+}
 
 exports = module.exports = Cdb;
