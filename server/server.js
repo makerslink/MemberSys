@@ -1,28 +1,25 @@
 "use strict";
 
-var connect = require('connect')
-var http = require('http')
-var serveStatic = require('serve-static')
-var memberDB = require('./memberDB')
-var async = require('async')
+var connect = require('connect');
+var http = require('http');
+var serveStatic = require('serve-static');
+var memberDB = require('./memberDB');
+var async = require('async');
+var app = connect();
+var srv = http.createServer(app);
+var io = require('socket.io')(srv);
 
-var app = connect()
-
-var serve = serveStatic('static', {'index': ['index.html', 'index.htm']})
-
-
+var serve = serveStatic('static', {'index': ['index.html', 'index.htm']});
 app.use( serve );
 
 //create node.js http server and listen on port
-var srv = http.createServer(app).listen(3000, function() {
+srv.listen(3000, function() {
     console.log('Listening on *:3000');
 });
 
 //
 // Socket stuff
 //
-var io = require('socket.io')(srv);
-
 io.on('connection', function(socket){
     console.log('A user connected');
     socket.emit('news', { hello: 'world' });
