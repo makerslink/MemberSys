@@ -5,21 +5,32 @@ var http = require('http')
 var serveStatic = require('serve-static')
 var memberDB = require('./memberDB')
 var async = require('async')
-var io = require('socket.io')(http);
 
 var app = connect()
 
 var serve = serveStatic('static', {'index': ['index.html', 'index.htm']})
 
+
 app.use( serve );
 
 //create node.js http server and listen on port
-http.createServer(app).listen(3000);
-
-io.on('connection', function(socket){
-  console.log('a user connected');
+var srv = http.createServer(app).listen(3000, function() {
+    console.log('Listening on *:3000');
 });
 
+//
+// Socket stuff
+//
+var io = require('socket.io')(srv);
+
+io.on('connection', function(socket){
+    console.log('A user connected');
+    socket.emit('news', { hello: 'world' });
+});
+
+// 
+// Database stuff
+//
 memberDB.connect(function(err, cdb) {
 	              
 	var test = {"fields":[{"type":"email", "value":"test@test.test", "visibility":"private"},
