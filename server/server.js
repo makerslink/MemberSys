@@ -5,15 +5,20 @@ var http = require('http')
 var serveStatic = require('serve-static')
 var memberDB = require('./memberDB')
 var async = require('async')
+var io = require('socket.io')(http);
 
 var app = connect()
 
 var serve = serveStatic('static', {'index': ['index.html', 'index.htm']})
 
-app.use( serve )
+app.use( serve );
 
 //create node.js http server and listen on port
-http.createServer(app).listen(3000)
+http.createServer(app).listen(3000);
+
+io.on('connection', function(socket){
+  console.log('a user connected');
+});
 
 memberDB.connect(function(err, cdb) {
 	              
