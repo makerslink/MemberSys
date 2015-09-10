@@ -23,6 +23,18 @@ srv.listen(3000, function() {
 io.on('connection', function(socket){
     console.log('A user connected');
     socket.emit('news', { hello: 'world' });
+
+    socket.on('checkEmailActive', function(emailAddress) {
+        console.log("Checking if e-mail address is active: " + emailAddress);
+
+
+
+        return false;
+    });
+
+    socket.on('disconnect', function () {
+        console.log("User disconnected");
+    });
 });
 
 // 

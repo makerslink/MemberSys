@@ -5,15 +5,26 @@
 <body>
 	<h1>Hello MarkerLink</h1>
 
+	<form method="#">
+		<input type="text" id="email">
+		<input type="submit">
+	</form>
+
 	<script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
+	<script src="http://code.jquery.com/jquery-1.11.1.js"></script>
 	<script>
-	
+
 var socket = io();
 
-socket.on('news', function (data) {
-	console.log(data);
-	socket.emit('my other event', { my: 'data' });
-});
+	$('form').submit(function(){
+		socket.emit('checkEmailActive', $('#email').val());
+		return false;
+	});
+
+
+	socket.on('checkEmailActive', function(active) {
+		console.log("E-mail is valid: " + active);
+	});
 
 	</script>
 </body>
